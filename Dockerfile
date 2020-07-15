@@ -1,55 +1,93 @@
-# Tiny Tiny RSS
-#
-# Version latest
-
-FROM alpine
+FROM php:7-fpm-alpine
 LABEL maintainer "Thomas Ingvarsson <ingvarsson.thomas@gmail.com>"
 
+ARG BUILD_DATE
+ARG VCS_REF
+ARG TTRSS_VERSION
+
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.name="tingvarsson/ttrss"
+LABEL org.label-schema.description="Tiny Tiny RSS image based on Alpine Linux"
+LABEL org.label-schema.vcs-url="https://github.com/tingvarsson-docker/docker.ttrss"
+LABEL org.label-schema.vcs-ref=$VCS_REF
+LABEL org.label-schema.version=$TTRSS_VERSION
+
+# Install php extensions and needed dependencies
 RUN apk add --no-cache \
-      supervisor \
-      nginx \
-      php7 \
-      php7-apcu \
-      php7-curl \
-      php7-dom \
-      php7-fileinfo \
-      php7-fpm \
-      php7-gd \
-      php7-iconv \
-      php7-intl \
-      php7-json \
-      php7-mbstring \
-      php7-mysqli \
-      php7-mysqlnd \
-      php7-opcache \
-      php7-pcntl \
-      php7-pdo_mysql \
-      php7-pdo_pgsql \
-      php7-pgsql \
-      php7-posix \
-      php7-session \
-      php7-zlib \
-    && apk add --no-cache --virtual=build-dependencies \
-      curl \
-      tar \
-    && mkdir /run/nginx \
-    && curl -o /tmp/ttrss.tar.gz -L "https://git.tt-rss.org/git/tt-rss/archive/master.tar.gz" \
-    && mkdir -p /var/www/html/ \
-    && tar xf /tmp/ttrss.tar.gz -C /var/www/html/ --strip-components=1 \
-    && rm -rf /tmp/ttrss.tar.gz \
+    freetype \
+    icu \
+    libjpeg-turbo \
+    libpng \
+    libwebp \
+    libxpm \
+    postgresql \
+    rsync \
+    zlib \
+    && apk add --no-cache --virtual=php-build-dependencies \
+    freetype-dev \
+    icu-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    libxpm-dev \
+    postgresql-dev \
+    && docker-php-ext-configure gd \
+    --enable-gd \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp \
+    --with-xpm \
+    && docker-php-ext-install \
+    gd \
+    intl \
+    opcache \
+    pcntl \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    pgsql \
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && apk del php-build-dependencies
+
+# Add TTRSS source to image
+ENV SRC_DIR=/src/ttrss
+
+ARG TTRSS_URL=https://git.tt-rss.org/fox/tt-rss/archive/$TTRSS_VERSION.tar.gz
+
+RUN apk add --no-cache --virtual=build-dependencies \
+    curl \
+    tar \
+    && mkdir -p $SRC_DIR \
+    && curl -s $TTRSS_URL | tar vxz -C $SRC_DIR --strip-components=1 \
     && apk del build-dependencies
 
-RUN adduser -u 82 -D -S -G www-data www-data \
-    && sed -i s/'user = nobody'/'user = www-data'/g /etc/php7/php-fpm.d/www.conf \
-    && sed -i s/'group = nobody'/'group = www-data'/g /etc/php7/php-fpm.d/www.conf \
-    && chown -R www-data:www-data /var/www/html/
+# Prepare bootstrap and target directory for non-root users
+ENV BOOTSTRAP_DIR=/bootstrap
+ENV TTRSS_DIR=/ttrss
+RUN mkdir -p $BOOTSTRAP_DIR $TTRSS_DIR \
+    && chmod a+rwx $BOOTSTRAP_DIR $TTRSS_DIR
+VOLUME $TTRSS_DIR
 
-VOLUME /ttrss
+# Configuration options
+# Used by start.sh and update.sh
+ENV ENABLE_BOOTSTRAP=false \
+    SKIP_DB_CHECK=false
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY supervisord.conf /etc/supervisord.conf
-COPY start.sh /start.sh
+# Database configuration (also used in TTRSS configuration)
+# Used by init.sh, start.sh and update.sh
+ENV DB_TYPE="pgsql" \
+    DB_HOST="localhost" \
+    DB_PORT="5432" \
+    DB_USER="ttrss" \
+    DB_PASS="ttrssPass"
 
-EXPOSE 80 443
+# Default TTRSS configuration can be controlled if no config.php is exist or is provided
+# Used by init.sh (and start.sh in bootstrap mode)
+ENV DB_NAME="ttrss" \
+    SELF_URL_PATH="http://localhost"
+
+ADD init.sh /
+ADD start.sh /
+ADD update.sh /
 
 CMD ["/start.sh"]

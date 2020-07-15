@@ -1,8 +1,10 @@
 #!/bin/sh
 
 if [ "$ENABLE_BOOTSTRAP" = "true" ]; then
-    /init.sh
-    touch /bootstrap/complete
+    while [ ! -e /bootstrap/complete ]; do
+        echo "waiting for bootstrap to complete..."
+        sleep 5
+    done
 fi
 
 if [ "$SKIP_DB_CHECK" != "true" ]; then
@@ -12,4 +14,4 @@ if [ "$SKIP_DB_CHECK" != "true" ]; then
     done
 fi
 
-php-fpm -F
+php /ttrss/update_daemon2.php
