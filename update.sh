@@ -14,4 +14,7 @@ if [ "$SKIP_DB_CHECK" != "true" ]; then
     done
 fi
 
+# One-time execution to update any schema changes
+php /ttrss/update.php --update-schema=force-yes
+
 php /ttrss/update_daemon2.php
