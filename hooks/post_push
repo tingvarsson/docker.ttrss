@@ -1,8 +1,8 @@
 #!/bin/bash
 
-VCS_REF=$(git rev-parse --short HEAD)
-docker tag $IMAGE_NAME $DOCKER_REPO:$VCS_REF
-docker push $DOCKER_REPO:$VCS_REF
+docker tag $IMAGE_NAME $DOCKER_REPO:$SOURCE_COMMIT
+docker push $DOCKER_REPO:$SOURCE_COMMIT
+
 TTRSS_VERSION=$(docker inspect --format '{{ index .Config.Labels "org.label-schema.version"}}' $IMAGE_NAME)
-docker tag $IMAGE_NAME $DOCKER_REPO:$VCS_REF-$TTRSS_VERSION
-docker push $DOCKER_REPO:$VCS_REF-$TTRSS_VERSION
+docker tag $IMAGE_NAME $DOCKER_REPO:$SOURCE_COMMIT-$TTRSS_VERSION
+docker push $DOCKER_REPO:$SOURCE_COMMIT-$TTRSS_VERSION
