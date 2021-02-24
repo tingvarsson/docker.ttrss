@@ -16,3 +16,8 @@ rsync -aP --delete \
     --exclude templates.local \
     --exclude themes.local \
     $SRC_DIR/ $TTRSS_DIR/
+
+# Setup empty default as TTRSS still expects one to exist
+if [ ! -s $TTRSS_DIR/config.php ]; then
+    cp $TTRSS_DIR/config.php-dist $TTRSS_DIR/config.php
+fi
