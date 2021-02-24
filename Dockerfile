@@ -73,18 +73,14 @@ VOLUME $TTRSS_DIR
 ENV ENABLE_BOOTSTRAP=false \
     SKIP_DB_CHECK=false
 
-# Database configuration (also used in TTRSS configuration)
-# Used by init.sh, start.sh and update.sh
-ENV DB_TYPE="pgsql" \
-    DB_HOST="localhost" \
-    DB_PORT="5432" \
-    DB_USER="ttrss" \
-    DB_PASS="ttrssPass"
-
-# Default TTRSS configuration can be controlled if no config.php is exist or is provided
-# Used by init.sh (and start.sh in bootstrap mode)
-ENV DB_NAME="ttrss" \
-    SELF_URL_PATH="http://localhost"
+# TTRSS Configuration
+ENV TTRSS_DB_TYPE="pgsql" \
+    TTRSS_DB_HOST="localhost" \
+    TTRSS_DB_PORT="5432" \
+    TTRSS_DB_USER="ttrss" \
+    TTRSS_DB_PASS="ttrssPass" \
+    TTRSS_DB_NAME="ttrss" \
+    TTRSS_SELF_URL_PATH="http://localhost"
 
 ADD init.sh /
 ADD start.sh /
