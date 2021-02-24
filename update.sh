@@ -8,8 +8,8 @@ if [ "$ENABLE_BOOTSTRAP" = "true" ]; then
 fi
 
 if [ "$SKIP_DB_CHECK" != "true" ]; then
-    while ! pg_isready -h $DB_HOST -U $DB_USER; do
-        echo "waiting until database ($DB_HOST) is ready..."
+    while ! pg_isready -h $TTRSS_DB_HOST -U $TTRSS_DB_USER; do
+        echo "waiting until database ($TTRSS_DB_HOST) is ready..."
         sleep 5
     done
 fi
