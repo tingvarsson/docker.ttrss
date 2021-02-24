@@ -80,7 +80,8 @@ ENV TTRSS_DB_TYPE="pgsql" \
     TTRSS_DB_USER="ttrss" \
     TTRSS_DB_PASS="ttrssPass" \
     TTRSS_DB_NAME="ttrss" \
-    TTRSS_SELF_URL_PATH="http://localhost"
+    TTRSS_SELF_URL_PATH="http://localhost" \
+    TTRSS_PHP_EXECUTABLE=/usr/local/bin/php
 
 ADD init.sh /
 ADD start.sh /
