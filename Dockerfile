@@ -1,4 +1,4 @@
-FROM php:7-fpm-alpine3.13
+FROM php:8-fpm-alpine3.13
 LABEL maintainer "Thomas Ingvarsson <ingvarsson.thomas@gmail.com>"
 
 ARG BUILD_DATE
