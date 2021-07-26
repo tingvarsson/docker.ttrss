@@ -1,17 +1,7 @@
 FROM php:8-fpm-alpine3.13
 LABEL maintainer "Thomas Ingvarsson <ingvarsson.thomas@gmail.com>"
 
-ARG BUILD_DATE
-ARG VCS_REF
 ARG TTRSS_VERSION
-
-LABEL org.label-schema.schema-version="1.0"
-LABEL org.label-schema.build-date=$BUILD_DATE
-LABEL org.label-schema.name="tingvarsson/ttrss"
-LABEL org.label-schema.description="Tiny Tiny RSS image based on Alpine Linux"
-LABEL org.label-schema.vcs-url="https://github.com/tingvarsson-docker/docker.ttrss"
-LABEL org.label-schema.vcs-ref=$VCS_REF
-LABEL org.label-schema.version=$TTRSS_VERSION
 
 # Install php extensions and needed dependencies
 RUN apk add --no-cache \
