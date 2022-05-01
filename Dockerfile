@@ -42,7 +42,7 @@ RUN apk add --no-cache \
 # Add TTRSS source to image
 ENV SRC_DIR=/src/ttrss
 
-ARG TTRSS_URL=https://git.tt-rss.org/fox/tt-rss/archive/$TTRSS_VERSION.tar.gz
+ARG TTRSS_URL=https://git-gitea.tt-rss.org/fox/tt-rss/archive/$TTRSS_VERSION.tar.gz
 
 RUN apk add --no-cache --virtual=build-dependencies \
     curl \
