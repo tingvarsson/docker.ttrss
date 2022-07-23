@@ -45,10 +45,10 @@ ENV SRC_DIR=/src/ttrss
 ARG TTRSS_URL=https://git-gitea.tt-rss.org/fox/tt-rss/archive/$TTRSS_VERSION.tar.gz
 
 RUN apk add --no-cache --virtual=build-dependencies \
-    curl \
     tar \
+    wget \
     && mkdir -p $SRC_DIR \
-    && curl -s $TTRSS_URL | tar vxz -C $SRC_DIR --strip-components=1 \
+    && wget -q -O- $TTRSS_URL | tar vxz -C $SRC_DIR --strip-components=1 \
     && apk del build-dependencies
 
 # Prepare bootstrap and target directory for non-root users
